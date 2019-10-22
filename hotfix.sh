@@ -84,6 +84,8 @@ finishHotfix() {
   rebaseBranch master
   rebaseBranch dev
 
+  echo "test"
+
   # DELETE HOTFIX BRANCH
   git push origin --delete hotfix/"${HOTFIX_NAME}"
   git branch -D hotfix/"${HOTFIX_NAME}"
