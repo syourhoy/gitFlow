@@ -19,14 +19,14 @@ incrementPatchVersion() {
   git checkout master
   npm version patch --no-git-tag-version
   getPackageVersion
-  git add ../package.json
+  git add ./package.json
   git commit -m "Updating patch version to ${PACKAGE_VERSION}" -- ./package.json
   git push
 
   git checkout dev
   npm version patch --no-git-tag-version
   getPackageVersion
-  git add ../package.json
+  git add ./package.json
   git commit -m "Updating patch version to ${PACKAGE_VERSION}" -- ./package.json
   git push
 }
