@@ -90,6 +90,7 @@ finishHotfix() {
 
   incrementPatchVersion
 
+
   # CREATE AND PUSH TAG
   git checkout master
   git tag -a "${PACKAGE_VERSION}" -m "Tag ${PACKAGE_VERSION}"
