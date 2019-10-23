@@ -12,7 +12,7 @@ checkUnstagedChanges() {
   if [ $? -ge 1 ]
   then
     echo "There is some unstaged changes..."
-    echo "Please, commit your changes before creating a new hotfix."
+    echo "Please, commit your changes before creating a new feature."
     exit 2
   fi
 }
