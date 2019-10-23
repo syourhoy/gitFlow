@@ -7,7 +7,7 @@ usage() {
 }
 
 getPackageVersion() {
-  PACKAGE_VERSION=$(cat ./package.json \
+  PACKAGE_VERSION=$(cat "${GIT_ROOT_DIR}"/package.json \
   | grep version \
   | head -1 \
   | awk -F: '{ print $2 }' \
@@ -22,7 +22,7 @@ checkIfReleaseExist() {
   then
     echo "Release ${PACKAGE_VERSION} already exists"
     echo "Finish the current release before starting a new one"
-    git checkout -- ./package.json
+    git checkout -- "${GIT_ROOT_DIR}"/package.json
     exit 2
   fi
 }
@@ -49,8 +49,8 @@ checkMergeConflict() {
 
 createRelease() {
   getPackageVersion
-  git add ./package.json
-  git commit -m "Init release ${PACKAGE_VERSION}" -- ./package.json
+  git add "${GIT_ROOT_DIR}"/package.json
+  git commit -m "Init release ${PACKAGE_VERSION}" -- "${GIT_ROOT_DIR}"/package.json
   git push
   echo "Creating release version ${PACKAGE_VERSION}"
   # Init hotfix branch
@@ -118,7 +118,8 @@ publishRelease() {
 
 GITHUB_PERSONAL_ACCESS_TOKEN=84dd1129ea3ec95116d5de185693b0a14abefe00
 GIT_REPOS_OWNER=syourhoy
-GIT_REPOS_NAME=$(basename "$(git rev-parse --show-toplevel)")
+GIT_ROOT_DIR=$(git rev-parse --show-toplevel)
+GIT_REPOS_NAME=$(basename "${GIT_ROOT_DIR}")
 
 if [ $# -eq 0 ]
 then
