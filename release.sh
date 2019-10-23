@@ -39,7 +39,7 @@ checkUnstagedChanges() {
 }
 
 checkMergeConflict() {
-  MERGE_STATUS=$(git status | grep "unmerged paths")
+  MERGE_STATUS=$(git status | grep -i "unmerged paths")
   if [ -n "${MERGE_STATUS}" ]
   then
     echo "Resolve merge conflict before finishing the hotfix"
