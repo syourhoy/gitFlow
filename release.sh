@@ -80,6 +80,8 @@ finishRelease() {
   git push origin --delete release/"${PACKAGE_VERSION}"
   git branch -D release/"${PACKAGE_VERSION}"
 
+  echo "test"
+
   # CREATE AND PUSH TAG
   git checkout master
   git tag -a "${PACKAGE_VERSION}" -m "Tag ${PACKAGE_VERSION}"
