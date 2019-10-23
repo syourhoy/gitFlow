@@ -7,7 +7,7 @@ usage() {
 }
 
 getPackageVersion() {
-  PACKAGE_VERSION=$(cat ../package.json \
+  PACKAGE_VERSION=$(cat ./package.json \
   | grep version \
   | head -1 \
   | awk -F: '{ print $2 }' \
@@ -22,7 +22,7 @@ checkIfReleaseExist() {
   then
     echo "Release ${PACKAGE_VERSION} already exists"
     echo "Finish the current release before starting a new one"
-    git checkout -- ../package.json
+    git checkout -- ./package.json
     exit 2
   fi
 }
@@ -49,24 +49,41 @@ checkMergeConflict() {
 
 createRelease() {
   getPackageVersion
-  git add ../package.json
-  git commit -m "Init release ${PACKAGE_VERSION}" -- ../package.json
+  git add ./package.json
+  git commit -m "Init release ${PACKAGE_VERSION}" -- ./package.json
   git push
   echo "Creating release version ${PACKAGE_VERSION}"
-  git flow release start "${PACKAGE_VERSION}"
+  # Init hotfix branch
+  git checkout -b release/"${PACKAGE_VERSION}"
   git push --tags -u origin release/"${PACKAGE_VERSION}"
+}
+
+rebaseBranch() {
+  git checkout release/"${PACKAGE_VERSION}"
+  git fetch "${1}"
+  git rebase origin/"${1}"
+  checkMergeConflict
+  git push -f
+  git checkout "${1}"
+  git merge release/"${PACKAGE_VERSION}"
+  checkMergeConflict
 }
 
 finishRelease() {
   getPackageVersion
   echo "Finishing release version ${PACKAGE_VERSION}"
-  git flow release finish "${PACKAGE_VERSION}"
-  checkMergeConflict
-  git checkout dev
-  git push
+
+  rebaseBranch master
+  rebaseBranch dev
+
+  # DELETE HOTFIX BRANCH
+  git push origin --delete release/"${PACKAGE_VERSION}"
+  git branch -D release/"${PACKAGE_VERSION}"
+
+  # CREATE AND PUSH TAG
   git checkout master
+  git tag -a "${PACKAGE_VERSION}" -m "Tag ${PACKAGE_VERSION}"
   git push --follow-tags
-  git checkout dev
 }
 
 publishRelease() {
@@ -107,10 +124,10 @@ fi
 git checkout dev
 git fetch
 checkUnstagedChanges
-git pull --rebase
 
 if [ "$1" = "start" ]
 then
+  git pull --rebase
   checkIfReleaseExist
   npm version minor --no-git-tag-version
   createRelease

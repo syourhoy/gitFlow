@@ -16,14 +16,7 @@ getPackageVersion() {
 }
 
 incrementPatchVersion() {
-  git checkout master
-  npm version patch --no-git-tag-version
-  getPackageVersion
-  git add ./package.json
-  git commit -m "Updating patch version to ${PACKAGE_VERSION}" -- ./package.json
-  git push
-
-  git checkout dev
+  git checkout "${1}"
   npm version patch --no-git-tag-version
   getPackageVersion
   git add ./package.json
@@ -90,7 +83,8 @@ finishHotfix() {
   git push origin --delete hotfix/"${HOTFIX_NAME}"
   git branch -D hotfix/"${HOTFIX_NAME}"
 
-  incrementPatchVersion
+  incrementPatchVersion master
+  incrementPatchVersion dev
 
   # CREATE AND PUSH TAG
   git checkout master
