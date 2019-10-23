@@ -1,0 +1,84 @@
+#!/bin/sh
+
+usage() {
+  echo "usage: ./feature.sh [start / finish]"
+  echo "start => Init a new feature"
+  echo "finish => Merge the feature to dev"
+}
+
+checkUnstagedChanges() {
+  echo "Checking unstaged changes..."
+  git diff-index --quiet HEAD --
+  if [ $? -ge 1 ]
+  then
+    echo "There is some unstaged changes..."
+    echo "Please, commit your changes before creating a new hotfix."
+    exit 2
+  fi
+}
+
+checkMergeConflict() {
+  MERGE_STATUS=$(git status | grep -i "unmerged paths")
+  if [ -n "${MERGE_STATUS}" ]
+  then
+    echo "Resolve merge conflict before finishing the feature"
+    exit 2
+  fi
+}
+
+createFeature() {
+  read -rp "Name of your feature: " FEATURE_NAME
+  echo "Creating feature ${FEATURE_NAME}"
+  # Init feature branch
+  git checkout -b feature/"${FEATURE_NAME}"
+  git push --tags -u origin feature/"${FEATURE_NAME}"
+}
+
+rebaseBranch() {
+  git checkout feature/"${FEATURE_NAME}"
+  git fetch "${1}"
+  git rebase origin/"${1}"
+  checkMergeConflict
+  git push -f
+  git checkout "${1}"
+  git merge feature/"${FEATURE_NAME}"
+  checkMergeConflict
+}
+
+finishFeature() {
+  read -rp "Name of the feature you want to finish: " FEATURE_NAME
+  FEATURE_COUNT=$(git ls-remote --heads origin feature/"${FEATURE_NAME}" | wc -l)
+  if [ "${FEATURE_COUNT}" -lt 1 ]
+  then
+    echo "There is not existing feature with this name..."
+    exit 2
+  fi
+
+  echo "Finishing feature ${FEATURE_NAME}"
+
+  rebaseBranch dev
+
+  # DELETE FEATURE BRANCH
+  git push origin --delete feature/"${FEATURE_NAME}"
+  git branch -D feature/"${FEATURE_NAME}"
+}
+
+if [ $# -eq 0 ]
+then
+  usage
+  exit 1
+fi
+
+# Checking out dev branch
+git checkout dev
+git fetch
+checkUnstagedChanges
+
+if [ "$1" = "start" ]
+then
+  git pull --rebase
+  createFeature
+elif [ "$1" = "finish" ]
+then
+  finishFeature
+fi
