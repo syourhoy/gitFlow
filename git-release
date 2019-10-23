@@ -114,6 +114,10 @@ publishRelease() {
   fi
 }
 
+GITHUB_PERSONAL_ACCESS_TOKEN=84dd1129ea3ec95116d5de185693b0a14abefe00
+GIT_REPOS_OWNER=syourhoy
+GIT_REPOS_NAME=$(basename "$(git rev-parse --show-toplevel)")
+
 if [ $# -eq 0 ]
 then
   usage
