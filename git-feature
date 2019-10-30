@@ -3,7 +3,7 @@
 usage() {
   echo "usage: ./feature.sh [start / finish]"
   echo "start => Init a new feature"
-  echo "finish => Merge the feature to dev"
+  echo "finish => Merge the feature to "${DEVELOPMENT_BRANCH}""
 }
 
 checkUnstagedChanges() {
@@ -56,7 +56,7 @@ finishFeature() {
 
   echo "Finishing feature ${FEATURE_NAME}"
 
-  rebaseBranch dev
+  rebaseBranch "${DEVELOPMENT_BRANCH}"
 
   # DELETE FEATURE BRANCH
   git push origin --delete feature/"${FEATURE_NAME}"
@@ -71,8 +71,8 @@ then
   exit 1
 fi
 
-# Checking out dev branch
-git checkout dev
+# Checking out "${DEVELOPMENT_BRANCH}" branch
+git checkout "${DEVELOPMENT_BRANCH}"
 git fetch
 checkUnstagedChanges
 

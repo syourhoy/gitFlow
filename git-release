@@ -3,7 +3,7 @@
 usage() {
   echo "usage: ./release.sh [start / finish]"
   echo "start => Init a new release"
-  echo "finish => Merge the release to master and dev and delete the branch"
+  echo "finish => Merge the release to "${MASTER_BRANCH}" and "${DEVELOPMENT_BRANCH}" and delete the branch"
 }
 
 getPackageVersion() {
@@ -73,8 +73,8 @@ finishRelease() {
   getPackageVersion
   echo "Finishing release version ${PACKAGE_VERSION}"
 
-  rebaseBranch master
-  rebaseBranch dev
+  rebaseBranch "${MASTER_BRANCH}"
+  rebaseBranch "${DEVELOPMENT_BRANCH}"
 
   # DELETE HOTFIX BRANCH
   git push origin --delete release/"${PACKAGE_VERSION}"
@@ -83,7 +83,7 @@ finishRelease() {
   echo "test"
 
   # CREATE AND PUSH TAG
-  git checkout master
+  git checkout "${MASTER_BRANCH}"
   git tag -a "${PACKAGE_VERSION}" -m "Tag ${PACKAGE_VERSION}"
   git push --follow-tags
 }
@@ -98,7 +98,7 @@ publishRelease() {
   -H "Content-Type: application/json" \
   -d "{
     \"tag_name\": \"${PACKAGE_VERSION}\",
-    \"target_commitish\": \"master\",
+    \"target_commitish\": \"${MASTER_BRANCH}\",
     \"name\": \"${PACKAGE_VERSION}\",
     \"body\": \"Release de la version ${PACKAGE_VERSION}\",
     \"draft\": false,
@@ -128,7 +128,7 @@ then
 fi
 
 # Checking out development branch
-git checkout dev
+git checkout "${DEVELOPMENT_BRANCH}"
 git fetch
 checkUnstagedChanges
 
