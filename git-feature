@@ -63,6 +63,8 @@ finishFeature() {
   git branch -D feature/"${FEATURE_NAME}"
 }
 
+. ./config
+
 if [ $# -eq 0 ]
 then
   usage

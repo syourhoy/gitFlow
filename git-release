@@ -116,8 +116,8 @@ publishRelease() {
   fi
 }
 
-GITHUB_PERSONAL_ACCESS_TOKEN=84dd1129ea3ec95116d5de185693b0a14abefe00
-GIT_REPOS_OWNER=syourhoy
+. ./config
+
 GIT_ROOT_DIR=$(git rev-parse --show-toplevel)
 GIT_REPOS_NAME=$(basename "${GIT_ROOT_DIR}")
 
