@@ -118,7 +118,8 @@ publishHotfix() {
   fi
 }
 
-. ./config
+BASE_DIR=$(dirname "$0")
+. "${BASE_DIR}"/config
 
 GIT_ROOT_DIR=$(git rev-parse --show-toplevel)
 GIT_REPOS_NAME=$(basename "${GIT_ROOT_DIR}")

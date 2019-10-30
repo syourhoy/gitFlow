@@ -63,7 +63,8 @@ finishFeature() {
   git branch -D feature/"${FEATURE_NAME}"
 }
 
-. ./config
+BASE_DIR=$(dirname "$0")
+. "${BASE_DIR}"/config
 
 if [ $# -eq 0 ]
 then
